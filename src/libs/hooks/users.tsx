@@ -16,10 +16,15 @@ export const useUser = (userId: string): ReturnType<typeof useSWR<User>> => {
   );
 };
 
+type UserListResponse = {
+  list: User[];
+  nextOffset: number;
+  hasNext: boolean;
+};
 const fetchUsers = async (
   offset: number = 0,
   limit: number = 5
-): Promise<User[]> => {
+): Promise<UserListResponse> => {
   return Promise.resolve(undefined as any);
 };
 export const useUsers = (): {
@@ -31,7 +36,7 @@ export const useUsers = (): {
     return 1;
   };
 
-  const { isLoading } = useSWRInfinite<User[]>(
+  const { isLoading, data } = useSWRInfinite<UserListResponse>(
     keyLoader,
     async () => {
       return await fetchUsers();
