@@ -1,3 +1,4 @@
+import React from "react";
 import useSWR from "swr";
 import useSWRInfinite from "swr/infinite";
 import type { User } from "../../model/User";
@@ -68,16 +69,21 @@ export const useUsers = (
     }
   );
 
+  const fetchNext = React.useCallback(async () => {
+    await setSize((size) => size + 1);
+  }, [setSize]);
+
+  const returnData = React.useMemo(() => {
+    return data === undefined
+      ? undefined
+      : {
+          list: data.flatMap((page) => page.list),
+        };
+  }, [data]);
+
   return {
-    data:
-      data === undefined
-        ? undefined
-        : {
-            list: data.flatMap((page) => page.list),
-          },
-    async fetchNext() {
-      await setSize((size) => size + 1);
-    },
+    data: returnData,
+    fetchNext,
     isLoading,
   };
 };
