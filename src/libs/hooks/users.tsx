@@ -25,7 +25,10 @@ const fetchUsers = async (
   offset: number = 0,
   limit: number = 5
 ): Promise<UserListResponse> => {
-  return Promise.resolve(undefined as any);
+  const response = await fetch(
+    `https://some.api.provider/api/user?limit=${limit}&offset=${offset}`
+  );
+  return response.json() as Promise<UserListResponse>;
 };
 export const useUsers = (
   limit: number = 5
@@ -58,16 +61,20 @@ export const useUsers = (
 
   const { isLoading, data } = useSWRInfinite<UserListResponse>(
     keyLoader,
-    async () => {
-      return await fetchUsers();
-    },
+    async ({ limit, offset }: Exclude<ReturnType<typeof keyLoader>, null>) =>
+      fetchUsers(offset, limit),
     {
       suspense: false,
     }
   );
 
   return {
-    data: undefined,
+    data:
+      data === undefined
+        ? undefined
+        : {
+            list: data.flatMap((page) => page.list),
+          },
     fetchNext() {
       return Promise.resolve();
     },
