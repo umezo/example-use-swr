@@ -59,7 +59,7 @@ export const useUsers = (
     }
   };
 
-  const { isLoading, data } = useSWRInfinite<UserListResponse>(
+  const { isLoading, data, setSize } = useSWRInfinite<UserListResponse>(
     keyLoader,
     async ({ limit, offset }: Exclude<ReturnType<typeof keyLoader>, null>) =>
       fetchUsers(offset, limit),
@@ -75,8 +75,8 @@ export const useUsers = (
         : {
             list: data.flatMap((page) => page.list),
           },
-    fetchNext() {
-      return Promise.resolve();
+    async fetchNext() {
+      await setSize((size) => size + 1);
     },
     isLoading,
   };
