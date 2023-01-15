@@ -6,8 +6,9 @@ import { sleep } from "../../sleep";
 import { getUserHandler } from "./libs/getUserHandler";
 import { getMockUser } from "./libs/getMockUser";
 import { Wrapper } from "./libs/Wrapper";
+import { getUsersHandler } from "./libs/getUsersHandler";
 
-const mockServer = setupServer(getUserHandler());
+const mockServer = setupServer(getUserHandler(), getUsersHandler());
 
 describe("libs/hooks/users", () => {
   beforeAll(() => {
