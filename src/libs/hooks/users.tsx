@@ -27,13 +27,33 @@ const fetchUsers = async (
 ): Promise<UserListResponse> => {
   return Promise.resolve(undefined as any);
 };
-export const useUsers = (): {
+export const useUsers = (
+  limit: number = 5
+): {
   data: { list: User[] } | undefined;
   isLoading: boolean;
   fetchNext(): Promise<void>;
 } => {
-  const keyLoader: any = () => {
-    return 1;
+  const keyLoader: SWRInfiniteKeyLoader<{
+    key: string;
+    offset: number;
+    limit: number;
+  }> = (pageIndex: number, previousPage: UserListResponse) => {
+    if (pageIndex === 0) {
+      return {
+        key: "/api/users",
+        offset: 0,
+        limit,
+      };
+    } else if (previousPage.hasNext) {
+      return {
+        key: "/api/users",
+        offset: previousPage.nextOffset,
+        limit,
+      };
+    } else {
+      return null;
+    }
   };
 
   const { isLoading, data } = useSWRInfinite<UserListResponse>(
