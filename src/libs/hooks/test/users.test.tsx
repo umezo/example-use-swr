@@ -5,7 +5,7 @@ import { useUser, useUsers } from "../users";
 import { sleep } from "../../sleep";
 import { getUserHandler } from "./libs/getUserHandler";
 import { getMockUser } from "./libs/getMockUser";
-import { Wrapper } from "./libs/Wrapper";
+import { createWrapper, Wrapper } from "./libs/Wrapper";
 import { getUsersHandler } from "./libs/getUsersHandler";
 
 const mockServer = setupServer(getUserHandler(), getUsersHandler());
@@ -50,5 +50,25 @@ describe("libs/hooks/users", () => {
 
     expect(result.current.data?.list).toHaveLength(10);
     expect(result.current.isLoading).toBeFalsy();
+  });
+
+  it("cache", async () => {
+    const cache = new Map();
+    const wrapper = createWrapper(cache);
+    const { result: list } = renderHook(() => useUsers(), {
+      wrapper,
+    });
+
+    expect(list.current.isLoading).toBeTruthy();
+
+    await act(sleep);
+
+    expect(list.current.isLoading).toBeFalsy();
+
+    const { result: user } = renderHook(() => useUser("3"), {
+      wrapper,
+    });
+
+    expect(user.current.data).toBeDefined();
   });
 });
