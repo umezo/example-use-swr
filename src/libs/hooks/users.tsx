@@ -22,11 +22,16 @@ const fetchUsers = async (
 ): Promise<User[]> => {
   return Promise.resolve(undefined as any);
 };
-export const useUsers = (): ReturnType<typeof useSWRInfinite<User[]>> => {
+export const useUsers = (): {
+  data: { list: User[] } | undefined;
+  isLoading: boolean;
+  fetchNext(): Promise<void>;
+} => {
   const keyLoader: any = () => {
     //
   };
-  return useSWRInfinite<User[]>(
+
+  useSWRInfinite<User[]>(
     keyLoader,
     async () => {
       return await fetchUsers();
@@ -35,4 +40,12 @@ export const useUsers = (): ReturnType<typeof useSWRInfinite<User[]>> => {
       suspense: false,
     }
   );
+
+  return {
+    data: undefined,
+    fetchNext() {
+      return Promise.resolve();
+    },
+    isLoading: false,
+  };
 };
