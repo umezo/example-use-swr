@@ -1,11 +1,21 @@
 import React from "react";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import useSWRInfinite from "swr/infinite";
 import type { User } from "../../model/User";
 
 const fetchUser = async (userId: string): Promise<User> => {
   const response = await fetch(`https://some.api.provider/api/user/${userId}`);
   return response.json() as Promise<User>;
+};
+const useMutateUser = () => {
+  const { mutate } = useSWRConfig();
+
+  return React.useCallback(
+    (user: User) => {
+      mutate(["/api/user/:userId", user.id], user, { revalidate: false });
+    },
+    [mutate]
+  );
 };
 export const useUser = (
   userId: User["id"]
@@ -40,6 +50,7 @@ export const useUsers = (
   isLoading: boolean;
   fetchNext(): Promise<void>;
 } => {
+  const mutateUser = useMutateUser();
   const keyLoader: SWRInfiniteKeyLoader<{
     key: string;
     offset: number;
@@ -64,8 +75,11 @@ export const useUsers = (
 
   const { isLoading, data, setSize } = useSWRInfinite<UserListResponse>(
     keyLoader,
-    async ({ limit, offset }: Exclude<ReturnType<typeof keyLoader>, null>) =>
-      fetchUsers(offset, limit),
+    async ({ limit, offset }: Exclude<ReturnType<typeof keyLoader>, null>) => {
+      const response = await fetchUsers(offset, limit);
+      response.list.forEach(mutateUser);
+      return response;
+    },
     {
       suspense: false,
     }
