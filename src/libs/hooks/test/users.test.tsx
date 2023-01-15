@@ -19,7 +19,7 @@ describe("libs/hooks/users", () => {
   });
 
   it("fetch a user", async () => {
-    const { result } = renderHook(() => useUser("100"), {
+    const { result } = renderHook(() => useUser(100), {
       wrapper: Wrapper,
     });
 
@@ -65,7 +65,7 @@ describe("libs/hooks/users", () => {
 
     expect(list.current.isLoading).toBeFalsy();
 
-    const { result: user } = renderHook(() => useUser("3"), {
+    const { result: user } = renderHook(() => useUser(3), {
       wrapper,
     });
 
