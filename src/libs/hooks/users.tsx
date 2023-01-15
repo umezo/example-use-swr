@@ -28,10 +28,10 @@ export const useUsers = (): {
   fetchNext(): Promise<void>;
 } => {
   const keyLoader: any = () => {
-    //
+    return 1;
   };
 
-  useSWRInfinite<User[]>(
+  const { isLoading } = useSWRInfinite<User[]>(
     keyLoader,
     async () => {
       return await fetchUsers();
@@ -46,6 +46,6 @@ export const useUsers = (): {
     fetchNext() {
       return Promise.resolve();
     },
-    isLoading: false,
+    isLoading,
   };
 };
