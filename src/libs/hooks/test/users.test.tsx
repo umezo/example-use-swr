@@ -48,10 +48,7 @@ describe("libs/hooks/users", () => {
 
     await act(result.current.fetchNext);
 
-    expect(result.current.data?.list).toHaveLength(5);
-
-    await act(sleep);
-
     expect(result.current.data?.list).toHaveLength(10);
+    expect(result.current.isLoading).toBeFalsy();
   });
 });
