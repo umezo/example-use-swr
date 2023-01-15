@@ -1,11 +1,22 @@
-import { describe, it, expect } from "vitest";
+import { describe, beforeAll, afterAll, it, expect } from "vitest";
+import { setupServer } from "msw/node";
 import { act, renderHook } from "@testing-library/react";
 import { useUser } from "../users";
 import { sleep } from "../../sleep";
+import { getUserHandler } from "./libs/getUserHandler";
 import { getMockUser } from "./libs/getMockUser";
 import { Wrapper } from "./libs/Wrapper";
 
+const mockServer = setupServer(getUserHandler());
+
 describe("libs/hooks/users", () => {
+  beforeAll(() => {
+    mockServer.listen();
+  });
+  afterAll(() => {
+    mockServer.close();
+  });
+
   it("fetch a user", async () => {
     const { result } = renderHook(() => useUser("100"), {
       wrapper: Wrapper,
